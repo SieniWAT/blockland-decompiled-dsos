@@ -1,77 +1,3 @@
-function onManifestHashReceived ()
-{
-	$manifestPending = 1;
-	LoadingProgressTxt.setValue ("DOWNLOADING FILE MANIFEST");
-	LoadingProgress.setValue (0);
-	LoadingSecondaryProgress.setValue (0);
-}
-
-function onManifestRecieved ()
-{
-	$manifestPending = 0;
-	$totalPendingBlobs = 0;
-}
-
-function setTotalPendingBlobs (%tpb)
-{
-	$totalPendingBlobs = %tpb;
-}
-
-function onBlobCacheCheckFinished ()
-{
-	if ($totalPendingBlobs == 1)
-	{
-		LoadingProgressTxt.setValue ("CHECKING CDN FOR 1 FILE");
-	}
-	else 
-	{
-		LoadingProgressTxt.setValue ("CHECKING CDN FOR " @ $totalPendingBlobs @ " FILES");
-	}
-	LoadingProgress.setValue (0);
-	LoadingSecondaryProgress.setValue (0);
-}
-
-function updateBlobsRemaining (%blobsRemaining)
-{
-	if ($manifestPending && %blobsRemaining == 1)
-	{
-		LoadingProgressTxt.setValue ("DOWNLOADING FILE MANIFEST");
-		LoadingProgress.setValue (0);
-		LoadingSecondaryProgress.setValue (0);
-		return;
-	}
-	if (%blobsRemaining > $totalPendingBlobs)
-	{
-		$totalPendingBlobs = %blobsRemaining;
-	}
-	if ($totalPendingBlobs > 0)
-	{
-		LoadingProgressTxt.setValue ("DOWNLOADING FILE " @ ($totalPendingBlobs - %blobsRemaining) + 1 @ " OF " @ $totalPendingBlobs);
-		LoadingProgress.setValue (($totalPendingBlobs - %blobsRemaining) / $totalPendingBlobs);
-		LoadingSecondaryProgress.setValue (0);
-		Canvas.repaint ();
-	}
-}
-
-function onBlobDownloadFinished ()
-{
-	LoadingProgressTxt.setValue ("LOADING DATABLOCKS");
-	LoadingSecondaryProgress.setValue (0);
-	LoadingProgress.setValue (0);
-	commandToServer ('BlobDownloadFinished');
-}
-
-function setDownloadSize (%size)
-{
-	$currDownloadSize = %size;
-}
-
-function updateDownloadProgress (%val)
-{
-	%percent = %val / $currDownloadSize;
-	LoadingSecondaryProgress.setValue (%percent);
-}
-
 function clientCmdMissionStartPhase1 (%seq, %missionName, %musicTrack)
 {
 	echo ("*** New Mission: " @ %missionName);
@@ -117,7 +43,7 @@ function clientCmdMissionStartPhase3 (%seq, %missionName)
 	$Client::MissionFile = %missionName;
 	if (lightScene ("sceneLightingComplete", ""))
 	{
-		echo ("Lighting mission....");
+		error ("Lighting mission....");
 		schedule (1, 0, "updateLightingProgress");
 		onMissionDownloadPhase3 (%missionName);
 		$lightingMission = 1;
@@ -139,6 +65,5 @@ function sceneLightingComplete ()
 	onPhase3Complete ();
 	onMissionDownloadComplete ();
 	commandToServer ('MissionStartPhase3Ack', $MSeq);
-	commandToServer ('RequestNamedTargets');
 }
 

@@ -1,9 +1,9 @@
-function clientCmdMissionStart (%seq)
+function clientCmdMissionStart (%null)
 {
-	ClearPhysicsCache ();
+	
 }
 
-function clientCmdMissionEnd (%seq)
+function clientCmdMissionEnd (%null)
 {
 	alxStopAll ();
 	$lightingMission = 0;
