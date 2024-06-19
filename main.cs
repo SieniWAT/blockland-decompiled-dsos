@@ -35,13 +35,3 @@ function initBaseServer ()
 	}
 }
 
-function onDatablockLimitExceeded ()
-{
-	$datablockExceededCount += 1;
-}
-
-function onDatablocksDeleted ()
-{
-	$datablockExceededCount = 0;
-}
-
